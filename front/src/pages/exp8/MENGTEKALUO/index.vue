@@ -93,11 +93,10 @@
 				</template>
 			</template>
 		</a-table>
-		<a-divider orientation="left">进行随机模拟并计算结果</a-divider>
-		<a-button @click="start()">开始模拟</a-button>
 		<a-divider orientation="left">概率分布统计</a-divider>
-		<a-spin />
-		<div><dataChart></dataChart></div>
+		<div>
+			<dataChart :x1="value1" :x2="value2" :y1="value3" :y2="value4"></dataChart>
+		</div>
 	</div>
 	<div class="subtitle">
 		六、实验思考
@@ -123,7 +122,7 @@
 	} from 'lodash-es';
 	import dataChart from './test.vue'
 	export default {
-		components:{
+		components: {
 			dataChart
 		},
 		data() {
@@ -210,7 +209,7 @@
 						width: 150,
 					},
 					{
-						title: '概率分布',
+						title: '概率分布类型',
 						dataIndex: 'distribution',
 						width: 150,
 					},
@@ -238,6 +237,23 @@
 			}
 		},
 		computed: {
+			value1() {
+				switch (this.exp) {
+					case 1:
+						return this.dataSource1[0].x1;
+					default:
+						return 0;
+				}
+			},
+			value2() {
+				return this.dataSource1[0].x2
+			},
+			value3() {
+				return this.dataSource1[1].x1
+			},
+			value4() {
+				return this.dataSource1[1].x2
+			},
 			formula() {
 				switch (this.exp) {
 					case 1:
@@ -294,9 +310,6 @@
 			savethink() {
 				this.thinkshow = true
 				console.log('保存实验思考')
-			},
-			start(){
-			console.log('start')
 			},
 			generatePDF() {
 				console.log('生成实验报告')
