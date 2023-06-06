@@ -70,6 +70,11 @@
 			<span>参数1：a 是区间的下界。</span>
 			<span>参数2：b 是区间的上界。</span>
 		</div>
+		<div class="subs">
+			<span>泊松分布：P(X = k) = (λ^k * e^(-λ)) / k!</span>
+			<span>P(X = k) 是随机变量 X 取值为 k 的概率</span>
+			<span>λ 是平均发生率（每个时间或空间间隔内的平均事件发生次数）</span>
+		</div>
 		<a-table :columns="columns" :data-source="tableData" bordered>
 			<template #bodyCell="{ column, text, record }">
 				<template v-if="['x1','x2'].includes(column.dataIndex)">
@@ -95,7 +100,8 @@
 		</a-table>
 		<a-divider orientation="left">概率分布统计</a-divider>
 		<div>
-			<dataChart :x1="value1" :x2="value2" :y1="value3" :y2="value4"></dataChart>
+			<dataChart :chart_type="exp" :x1="value1" :x2="value2" :y1="value3" :y2="value4" :z1="value5" :z2="value6">
+			</dataChart>
 		</div>
 	</div>
 	<div class="subtitle">
@@ -155,45 +161,66 @@
 				],
 				dataSource2: [{
 						key: '1',
-						name: '变量3',
-						distribution: '正态分布',
+						name: '开发人员数量',
+						distribution: '均匀分布',
 						x1: 0,
 						x2: 0,
 					},
 					{
 						key: '2',
-						name: '变量4',
-						distribution: '均匀分布',
+						name: '开发人员水平',
+						distribution: '泊松分布',
+						x1: 0,
+						x2: 0,
+					},
+					{
+						key: '3',
+						name: '系统复杂度',
+						distribution: '正态分布',
 						x1: 0,
 						x2: 0,
 					},
 				],
 				dataSource3: [{
 						key: '1',
-						name: '变量5',
+						name: '市场规模',
 						distribution: '正态分布',
 						x1: 0,
 						x2: 0,
 					},
 					{
 						key: '2',
-						name: '变量6',
-						distribution: '均匀分布',
+						name: '市场份额',
+						distribution: '正态分布',
+						x1: 0,
+						x2: 0,
+					},
+					{
+						key: '3',
+						name: '产品价格',
+						distribution: '正态分布',
 						x1: 0,
 						x2: 0,
 					},
 				],
 				dataSource4: [{
 						key: '1',
-						name: '变量1',
+						name: '开发时间',
 						distribution: '正态分布',
 						x1: 0,
 						x2: 0,
 					},
 					{
 						key: '2',
-						name: '变量2',
-						distribution: '均匀分布',
+						name: '代码缺陷率',
+						distribution: '正态分布',
+						x1: 0,
+						x2: 0,
+					},
+					{
+						key: '3',
+						name: '缺陷修复时间',
+						distribution: '正态分布',
 						x1: 0,
 						x2: 0,
 					},
@@ -241,29 +268,96 @@
 				switch (this.exp) {
 					case 1:
 						return this.dataSource1[0].x1;
+					case 2:
+						return this.dataSource2[0].x1;
+					case 3:
+						return this.dataSource3[0].x1;
+					case 4:
+						return this.dataSource4[0].x1;
 					default:
 						return 0;
 				}
 			},
 			value2() {
-				return this.dataSource1[0].x2
+				switch (this.exp) {
+					case 1:
+						return this.dataSource1[0].x2
+					case 2:
+						return this.dataSource2[0].x2;
+					case 3:
+						return this.dataSource3[0].x2;
+					case 4:
+						return this.dataSource4[0].x2;
+					default:
+						return 0;
+				}
 			},
 			value3() {
-				return this.dataSource1[1].x1
+				switch (this.exp) {
+					case 1:
+						return this.dataSource1[1].x1;
+					case 2:
+						return this.dataSource2[1].x1;
+					case 3:
+						return this.dataSource3[1].x1;
+					case 4:
+						return this.dataSource4[1].x1;
+					default:
+						return 0;
+				}
 			},
 			value4() {
-				return this.dataSource1[1].x2
+				switch (this.exp) {
+					case 1:
+						return this.dataSource1[1].x2;
+					case 2:
+						return this.dataSource2[1].x2;
+					case 3:
+						return this.dataSource3[1].x2;
+					case 4:
+						return this.dataSource4[1].x2;
+					default:
+						return 0;
+				}
+			},
+			value5() {
+				switch (this.exp) {
+					case 1:
+						return 0;
+					case 2:
+						return this.dataSource2[2].x1;
+					case 3:
+						return this.dataSource3[2].x1;
+					case 4:
+						return this.dataSource4[2].x1;
+					default:
+						return 0;
+				}
+			},
+			value6() {
+				switch (this.exp) {
+					case 1:
+						return 0;
+					case 2:
+						return this.dataSource2[2].x2;
+					case 3:
+						return this.dataSource3[2].x2;
+					case 4:
+						return this.dataSource4[2].x2;
+					default:
+						return 0;
+				}
 			},
 			formula() {
 				switch (this.exp) {
 					case 1:
 						return '项目成本=项目天数*平均花费';
 					case 2:
-						return '3';
+						return '软件构建质量（每千行代码bug数）=开发人员数量*开发人员水平（每千行代码bug数）*系统复杂度（有几千行）';
 					case 3:
-						return '2';
+						return '销售量=市场规模*市场份额*产品价格';
 					default:
-						return '4';
+						return '缺陷修复时间=平均修复时间*开发时间*代码缺陷率';
 				}
 			},
 			tableData() {
