@@ -12,7 +12,12 @@
 		data() {
 			return {
 				simulationResults: [],
+				average: 0,
+				median: 0,
+				q1: 0,
+				q3: 0,
 				bin_size: 10,
+				show: true,
 			}
 		},
 		methods: {
@@ -29,7 +34,7 @@
 				console.log('z1', this.z1)
 				console.log('z2', this.z2)
 				var result = 0
-
+				this.show = true
 				// 进行模拟并记录结果
 				for (let i = 0; i < iterations; i++) {
 					if (this.chart_type == 1) {
@@ -114,6 +119,10 @@
 				return mean + stdDev * randomNum;
 			},
 			randomUniformDistribution(min, max) {
+				if (max < min && this.show) {
+					alert('均匀分布的下界应小于上界')
+					this.show = false
+				}
 				// 生成均匀分布随机数
 				return Math.random() * (max - min) + min;
 			},
@@ -132,6 +141,7 @@
 			},
 			drawChart() {
 				const data = this.calculateProbabilityDistribution();
+				this.calculateQuartilesAndMedian()
 				const titles = ['项目成本的概率分布', '项目的构建质量的概率分布', '项目的销售量的概率分布', '项目开发时间的概率分布']
 				const xnames = ['项目成本', '项目的构建质量', '项目的销售量', '项目开发时间']
 				const option = {
@@ -142,7 +152,8 @@
 							fontSize: 24,
 							color: "#000000"
 						},
-						subtext: '平均值：' + this.calculateAverage(),
+						subtext: '平均值：' + this.calculateAverage().toFixed(2) + ' 中位数：' + this.median + ' 第一四分位数：' +
+							this.q1 + ' 第二四分位数：' + this.q3,
 					},
 					xAxis: {
 						type: 'category',
@@ -156,12 +167,6 @@
 					series: [{
 						data: Object.values(data),
 						type: 'bar',
-						// markPoint: {
-						// 	data: [{
-						// 		type: 'max',
-						// 		name: '最大值'
-						// 	}]
-						// },
 					}, ],
 				};
 
@@ -175,6 +180,45 @@
 				}
 				//计算平均值
 				return total / 1000
+			},
+			calculateQuartilesAndMedian() {
+				// 对数组进行排序
+				const sortedArr = this.simulationResults.slice().sort((a, b) => a - b);
+
+				// 计算中位数
+				this.median = this.calculateMedian(sortedArr).toFixed(2);
+
+				// 计算第一四分位数
+				this.q1 = this.calculatePercentile(sortedArr, 25).toFixed(2);
+
+				// 计算第三四分位数
+				this.q3 = this.calculatePercentile(sortedArr, 75).toFixed(2);
+			},
+			calculateMedian(sortedArr) {
+				const length = sortedArr.length;
+
+				if (length % 2 === 0) {
+					const midIndex1 = length / 2 - 1;
+					const midIndex2 = length / 2;
+					return (sortedArr[midIndex1] + sortedArr[midIndex2]) / 2;
+				} else {
+					const midIndex = Math.floor(length / 2);
+					return sortedArr[midIndex];
+				}
+			},
+			calculatePercentile(sortedArr, percentile) {
+				const length = sortedArr.length;
+				const index = percentile / 100 * (length - 1);
+
+				if (Number.isInteger(index)) {
+					return sortedArr[index];
+				} else {
+					const lowerIndex = Math.floor(index);
+					const upperIndex = Math.ceil(index);
+					const lowerValue = sortedArr[lowerIndex];
+					const upperValue = sortedArr[upperIndex];
+					return lowerValue + (upperValue - lowerValue) * (index - lowerIndex);
+				}
 			},
 			calculateProbabilityDistribution() {
 				const data = {};

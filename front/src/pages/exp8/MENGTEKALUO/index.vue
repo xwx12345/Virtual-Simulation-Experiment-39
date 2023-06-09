@@ -117,9 +117,6 @@
 			<a-button type="primary" ghost @click="savethink()" style="margin-top: 5px;">保存</a-button>
 		</div>
 	</div>
-	<div class="bottom">
-		<a-button type="primary" ghost @click="generatePDF()" style="margin-top: 5px;">生成实验报告</a-button>
-	</div>
 </template>
 
 <script>
